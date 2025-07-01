@@ -6,7 +6,7 @@ It is used to store the data of the application.
 It is a simple storage backend that uses the local filesystem.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import shutil
 import logging
@@ -15,7 +15,13 @@ from itertools import islice
 from pathlib import Path
 from typing import BinaryIO, Generator
 from am.config import StorageConfig
-from am.storage.types import NoSuchBucketError, NoSuchFileError, Storage, FileData
+from am.storage.types import (
+    BucketData,
+    NoSuchBucketError,
+    NoSuchFileError,
+    Storage,
+    FileData,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +42,18 @@ class DiskStorage(Storage):
         logger.debug("Deleting bucket=%s", name)
         shutil.rmtree(os.path.join(self.path, name))
 
-    def list_buckets(self, start: int = 0, limit: int = 100) -> list[str]:
+    def list_buckets(self, start: int = 0, limit: int = 100) -> list[BucketData]:
         logger.debug("Listing buckets: start=%s limit=%s", start, limit)
-        return os.listdir(self.path)[start : start + limit]
+        return [
+            BucketData(
+                name=name,
+                creation_date=datetime.fromtimestamp(
+                    os.path.getmtime(os.path.join(self.path, name)),
+                    tz=timezone.utc,
+                ),
+            )
+            for name in os.listdir(self.path)[start : start + limit]
+        ]
 
     def list_files(
         self, bucket: str, start: int = 0, limit: int = 100
@@ -57,9 +72,12 @@ class DiskStorage(Storage):
             for file in files:
                 if not os.path.isdir(os.path.join(path, file)):
                     yield FileData(
-                        name=os.path.join(prefix, file),
+                        key=os.path.join(prefix, file),
                         size=os.path.getsize(os.path.join(path, file)),
-                        modified=os.path.getmtime(os.path.join(path, file)),
+                        last_modified=datetime.fromtimestamp(
+                            os.path.getmtime(os.path.join(path, file)),
+                            tz=timezone.utc,
+                        ),
                     )
             # then list directories
             for file in files:
@@ -114,7 +132,10 @@ class DiskStorage(Storage):
 
         statdata = filepath.stat()
         return FileData(
-            name=file,
+            key=file,
             size=statdata.st_size,
-            modified=datetime.fromtimestamp(statdata.st_mtime),
+            last_modified=datetime.fromtimestamp(
+                statdata.st_mtime,
+                tz=timezone.utc,
+            ),
         )

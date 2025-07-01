@@ -34,9 +34,19 @@ class FileData:
     FileData is the data of a file.
     """
 
-    name: str
+    key: str
     size: int
-    modified: datetime
+    last_modified: datetime
+
+
+@dataclass
+class BucketData:
+    """
+    BucketData is the data of a bucket.
+    """
+
+    name: str
+    creation_date: datetime
 
 
 class Storage(ABC):
@@ -59,7 +69,7 @@ class Storage(ABC):
         pass
 
     @abstractmethod
-    def list_buckets(self, start: int = 0, limit: int = 100) -> list[str]:
+    def list_buckets(self, start: int = 0, limit: int = 100) -> list[BucketData]:
         """
         Get a bucket.
         """

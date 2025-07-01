@@ -54,7 +54,7 @@ class TestDiskStorage(TestCase):
         files = storage.list_files("test")
         logger.debug("Files: %s", files)
         assert len(files) == 1
-        assert files[0].name == "test.txt"
+        assert files[0].key == "test.txt"
         assert files[0].size == 4
         assert files[0].modified is not None
 
