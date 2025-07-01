@@ -4,12 +4,12 @@ Simple asset manager that allows to upload files into bucketts, and retrieve the
 
 Basic goals:
 
-- [ ] Create buckets
-- [ ] Upload files
-- [ ] Retrieve files
-- [ ] Delete files
-- [ ] List files
-- [ ] Initial backend is always disk.
+- [x] Create buckets
+- [x] Upload files
+- [x] Retrieve files
+- [x] Delete files
+- [x] List files
+- [x] Initial backend is always disk.
 
 Future goals:
 
