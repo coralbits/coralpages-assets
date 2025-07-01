@@ -17,3 +17,35 @@ Future goals:
 - [ ] Related files - Using the filters have alternate views of the file, as the reencoded, or a given cropped size of an image.
 - [ ] File versioning - Allow to keep multiple versions of the same file, and retrieve them later.
 - [ ] Alternative backends - S3, GCP, Azure, etc. Each bucket can have other backend.
+
+## Manual test
+
+Create a bucket
+
+```sh
+curl -X PUT http://localhost:8005/test/
+```
+
+Upload a file
+
+```sh
+curl -T test.txt http://localhost:8005/test/test.txt
+```
+
+List files
+
+```sh
+curl http://localhost:8005/test/
+```
+
+Retrieve a file
+
+```sh
+curl http://localhost:8005/test/test.txt
+```
+
+Delete a file
+
+```sh
+curl -X DELETE http://localhost:8005/test/test.txt
+```
