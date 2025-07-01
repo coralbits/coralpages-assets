@@ -4,11 +4,13 @@
 Serve the application.
 """
 
+import json
 import logging
 import argparse
 import mimetypes
 import sys
 from pathlib import Path
+from am.storage.types import NoSuchBucketError
 from am.storage.factory import get_storage
 from am.config import load_config, config
 import fastapi
@@ -44,17 +46,24 @@ def list_buckets():
 
 @app.get("/{bucket}/")
 def list_files(bucket: str):
-    storage = get_storage(bucket)
-    return {
-        "contents": [
-            {
-                "key": file.key,
-                "size": file.size,
-                "last_modified": file.last_modified.isoformat(),
-            }
-            for file in storage.list_files(bucket)
-        ]
-    }
+    try:
+        storage = get_storage(bucket)
+        return {
+            "contents": [
+                {
+                    "key": file.key,
+                    "size": file.size,
+                    "last_modified": file.last_modified.isoformat(),
+                }
+                for file in storage.list_files(bucket)
+            ]
+        }
+    except NoSuchBucketError:
+        return fastapi.Response(
+            status_code=404,
+            media_type="application/json",
+            content=json.dumps({"details": f"Bucket {bucket} not found"}),
+        )
 
 
 @app.put("/{bucket}/")
@@ -114,7 +123,11 @@ def load_args():
     Load the arguments.
     """
     parser = argparse.ArgumentParser()
+    parser.add_argument("other", nargs="*", help="Other arguments are ignored")
     parser.add_argument("--config", type=str, default="config.yaml")
+    parser.add_argument("--port", type=int, default=None)
+    parser.add_argument("--host", type=str, default=None)
+    parser.add_argument("--reload", action="store_true", default=None)
     return parser.parse_args()
 
 
@@ -129,7 +142,7 @@ if __name__ == "__main__":
 
     uvicorn.run(
         "serve:app",
-        host=config.server.host,
-        port=config.server.port,
-        reload=config.server.reload,
+        host=args.host or config.server.host,
+        port=args.port or config.server.port,
+        reload=args.reload or config.server.reload,
     )
