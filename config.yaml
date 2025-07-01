@@ -1,0 +1,7 @@
+storage:
+  - name: default
+    type: disk
+    path: ./data/default/
+
+database:
+  url: sqlite://data/database.db
