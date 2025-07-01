@@ -1,6 +1,8 @@
 #!/usr/bin/env -S uv run --script
 
 import logging
+import os
+import shutil
 import sys
 from pathlib import Path
 from unittest import TestCase
@@ -16,6 +18,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from am.storage.types import NoSuchBucketError
 from am.storage.factory import create_storage
+from am.config import StorageConfig
 
 
 class TestDiskStorage(TestCase):
@@ -23,11 +26,21 @@ class TestDiskStorage(TestCase):
     TestDiskStorage is a test case for the DiskStorage class.
     """
 
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        # remove previous test data
+        if os.path.exists("./data/test/"):
+            shutil.rmtree("./data/test/")
+
     def test_disk_storage(self):
         """
         Test the DiskStorage class.
         """
-        storage = create_storage({"type": "disk", "path": "./data"})
+        storage = create_storage(
+            StorageConfig(name="default", type="disk", config={"path": "./data/test/"})
+        )
         storage.create_bucket("test")
         with storage.open_write("test", "test.txt") as f:
             f.write(b"test")
@@ -45,10 +58,14 @@ class TestDiskStorage(TestCase):
         assert files[0].size == 4
         assert files[0].modified is not None
 
-        assert storage.list_buckets() == ["test"]
+        buckets = storage.list_buckets()
+        logger.debug("Buckets: %s", buckets)
+        assert buckets == ["test"]
 
         storage.delete_bucket("test")
-        assert storage.list_buckets() == []
+        buckets = storage.list_buckets()
+        logger.debug("Buckets: %s", buckets)
+        assert buckets == []
         with self.assertRaises(NoSuchBucketError):
             storage.list_files("test")
 

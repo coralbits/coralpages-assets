@@ -5,9 +5,11 @@ Serve the application.
 """
 
 import logging
+import argparse
 import sys
 from pathlib import Path
 from am.storage.factory import get_storage
+from am.config import load_config, config
 import fastapi
 import uvicorn
 
@@ -55,5 +57,22 @@ async def create_file(request: fastapi.Request, bucket: str, file: str):
     return {"file": file}
 
 
+def load_args():
+    """
+    Load the arguments.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=str, default="config.yaml")
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    uvicorn.run("serve:app", host="0.0.0.0", port=8000, reload=True)
+    args = load_args()
+    load_config(args.config)
+
+    uvicorn.run(
+        "serve:app",
+        host=config.server.host,
+        port=config.server.port,
+        reload=config.server.reload,
+    )

@@ -14,6 +14,7 @@ from contextlib import contextmanager
 from itertools import islice
 from pathlib import Path
 from typing import BinaryIO, Generator
+from am.config import StorageConfig
 from am.storage.types import NoSuchBucketError, NoSuchFileError, Storage, FileData
 
 logger = logging.getLogger(__name__)
@@ -24,8 +25,8 @@ class DiskStorage(Storage):
     DiskStorage is a storage backend that uses the local filesystem.
     """
 
-    def __init__(self, config: dict):
-        self.path = config["path"]
+    def __init__(self, config: StorageConfig):
+        self.path = config.config["path"]
 
     def create_bucket(self, name: str) -> None:
         logger.debug("Creating bucket=%s", name)
