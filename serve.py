@@ -14,6 +14,7 @@ from am.storage.types import NoSuchBucketError
 from am.storage.factory import get_storage
 from am.config import load_config, config
 import fastapi
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 
@@ -25,6 +26,13 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 app = fastapi.FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config.server.allow_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
