@@ -10,6 +10,7 @@ import argparse
 import mimetypes
 import sys
 from pathlib import Path
+import traceback
 from am.storage.types import NoSuchBucketError
 from am.storage.factory import get_storage
 from am.config import load_config, config
@@ -98,9 +99,17 @@ def head_file(bucket: str, file: str):
 def get_file(request: fastapi.Request, bucket: str, file: str):
     storage = get_storage(bucket)
     mime_type = mimetypes.guess_type(file)[0] or "application/octet-stream"
-    stat = storage.stat(bucket, file)
-    with storage.open_read(bucket, file) as f:
-        content = f.read()
+    try:
+        stat = storage.stat(bucket, file)
+        with storage.open_read(bucket, file) as f:
+            content = f.read()
+    except Exception as e:
+        traceback.print_exc()
+        return fastapi.Response(
+            status_code=404,
+            media_type="application/json",
+            content=json.dumps({"details": str(e)}),
+        )
 
     if request.headers.get("If-Modified-Since") == stat.last_modified.isoformat():
         return fastapi.Response(
