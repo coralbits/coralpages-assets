@@ -4,27 +4,29 @@
 Serve the application.
 """
 
+import argparse
 import json
 import logging
-import argparse
 import mimetypes
 import sys
-from pathlib import Path
 import traceback
-from am.storage.types import NoSuchBucketError
-from am.storage.factory import get_storage
-from am.config import load_config, config
-import fastapi
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+import uuid
+from pathlib import Path
 
+import fastapi
+import uvicorn
+from am.config import config, load_config
+from am.storage.factory import get_storage
+from am.storage.types import NoSuchBucketError
+from am.setup import setup_logging, trace_id_var
+from fastapi.middleware.cors import CORSMiddleware
 
 sys.path.append(str(Path(__file__).parent))
 
+setup_logging()
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
 
 app = fastapi.FastAPI()
 app.add_middleware(
@@ -34,6 +36,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def set_trace_id(request: fastapi.Request, call_next):
+    trace_id = request.headers.get("x-trace-id") or uuid.uuid4().hex
+    request.state.trace_id = trace_id
+    trace_id_var.set(trace_id)
+    response = await call_next(request)
+    trace_id_var.set(None)
+    return response
 
 
 @app.get("/")
@@ -156,7 +168,6 @@ except Exception as e:
     sys.exit(1)
 
 if __name__ == "__main__":
-
     uvicorn.run(
         "serve:app",
         host=args.host or config.server.host,
