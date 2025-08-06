@@ -48,7 +48,7 @@ async def set_trace_id(request: fastapi.Request, call_next):
     return response
 
 
-@app.get("/")
+@app.get("/api/v1/")
 def list_buckets():
     storage = get_storage("default")
     buckets = storage.list_buckets()
@@ -65,7 +65,7 @@ def list_buckets():
     }
 
 
-@app.get("/{bucket}/")
+@app.get("/api/v1/{bucket}/")
 def list_files(bucket: str):
     try:
         storage = get_storage(bucket)
@@ -87,14 +87,14 @@ def list_files(bucket: str):
         )
 
 
-@app.put("/{bucket}/")
+@app.put("/api/v1/{bucket}/")
 def create_bucket(bucket: str):
     storage = get_storage(bucket)
     storage.create_bucket(bucket)
     return {"bucket": bucket}
 
 
-@app.head("/{bucket}/{file:path}")
+@app.head("/api/v1/{bucket}/{file:path}")
 def head_file(bucket: str, file: str):
     storage = get_storage(bucket)
     stat = storage.stat(bucket, file)
@@ -107,7 +107,7 @@ def head_file(bucket: str, file: str):
     )
 
 
-@app.get("/{bucket}/{file:path}")
+@app.get("/api/v1/{bucket}/{file:path}")
 def get_file(request: fastapi.Request, bucket: str, file: str):
     storage = get_storage(bucket)
     mime_type = mimetypes.guess_type(file)[0] or "application/octet-stream"
@@ -139,7 +139,7 @@ def get_file(request: fastapi.Request, bucket: str, file: str):
     )
 
 
-@app.put("/{bucket}/{file:path}")
+@app.put("/api/v1/{bucket}/{file:path}")
 async def create_file(request: fastapi.Request, bucket: str, file: str):
     storage = get_storage(bucket)
     with storage.open_write(bucket, file) as f:
