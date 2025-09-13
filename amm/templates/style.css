@@ -229,8 +229,7 @@ input[type="submit"]:active {
 }
 
 .file-viewer-dialog::backdrop {
-  background: var(--bg-surface);
-  backdrop-filter: blur(8px);
+  background: oklch(from var(--bg-surface) l c h / 0.5);
   animation: backdropFadeIn 0.3s ease-out;
 }
 
