@@ -19,6 +19,7 @@ from am.config import config, load_config
 from am.storage.factory import get_storage
 from am.storage.types import NoSuchBucketError
 from am.setup import setup_logging, trace_id_var
+from amm.app import routes as amm_routes
 from fastapi.middleware.cors import CORSMiddleware
 
 sys.path.append(str(Path(__file__).parent))
@@ -36,6 +37,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(amm_routes)
 
 
 @app.middleware("http")

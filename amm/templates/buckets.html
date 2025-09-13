@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block content %}
+<h1>Buckets List</h1>
+
+<table>
+  <head>
+    <tr>
+      <th>Name</th>
+      <th>Creation Date</th>
+    </tr>
+  </head>
+  <body>
+    {% for bucket in buckets %}
+    <tr>
+      <td><a href="/{{ bucket.name }}">{{ bucket.name }}</a></td>
+      <td>{{ bucket.creation_date }}</td>
+    </tr>
+    {% endfor %}
+  </body>
+</table>
+
+{% endblock %}

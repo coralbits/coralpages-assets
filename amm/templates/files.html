@@ -1,0 +1,43 @@
+{% extends "base.html" %} {% block content %}
+<h1>Files List</h1>
+
+<table>
+  <head>
+    <tr>
+      <th>Name</th>
+      <th>Creation Date</th>
+    </tr>
+  </head>
+  <body>
+    {% for file in files %}
+    <tr>
+      <td><a href="/api/v1/{{bucket}}/{{ file.key }}">{{ file.key }}</a></td>
+      <td>{{ file.last_modified }}</td>
+    </tr>
+    {% endfor %}
+  </body>
+</table>
+
+<form
+  onsubmit="event.preventDefault(); uploadFile(this);"
+  enctype="multipart/form-data"
+>
+  <script>
+    async function uploadFile(form) {
+      const file = form.file.files[0];
+      const filename = form.name.value || file.name;
+      const response = await fetch(`/api/v1/{{ bucket }}/${filename}`, {
+        method: "PUT",
+        body: file,
+      });
+      if (response.ok) {
+        window.location.reload();
+      }
+    }
+  </script>
+  <input type="text" name="name" />
+  <input type="file" name="file" />
+  <input type="submit" />
+</form>
+
+{% endblock %}
