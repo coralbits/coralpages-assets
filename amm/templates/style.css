@@ -61,6 +61,15 @@ td {
   border-bottom: 1px solid var(--accent);
 }
 
+tr[onclick]:hover {
+  cursor: pointer;
+  background-color: var(--accent);
+  color: var(--bg);
+}
+tr[onclick]:hover a {
+  color: var(--bg);
+}
+
 th {
   color: var(--primary);
   font-weight: 600;
@@ -88,4 +97,167 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
   background: var(--secondary);
+}
+
+/* File Viewer Modal Dialog Styles */
+.file-viewer-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  height: 90vh;
+  max-width: 1200px;
+  max-height: 800px;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  overflow: hidden;
+  animation: dialogFadeIn 0.3s ease-out;
+}
+
+.file-viewer-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  animation: backdropFadeIn 0.3s ease-out;
+}
+
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--primary);
+  color: var(--bg);
+  border-bottom: 1px solid var(--accent);
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--bg);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: var(--bg);
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--bg);
+}
+
+.close-button:focus {
+  outline: 2px solid var(--bg);
+  outline-offset: 2px;
+}
+
+.dialog-content {
+  height: calc(100% - 80px);
+  padding: 0;
+  overflow: hidden;
+  background: repeating-linear-gradient(
+    45deg,
+    #2a2a2a 0px,
+    #2a2a2a 10px,
+    #1a1a1a 10px,
+    #1a1a1a 20px
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-content iframe,
+.dialog-content img,
+.dialog-content video {
+  max-width: 100%;
+  max-height: 100%;
+  border: none;
+  background: var(--bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-content img {
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.dialog-content img:hover {
+  transform: scale(1.02);
+}
+
+.dialog-content video {
+  object-fit: contain;
+}
+
+#previewContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .file-viewer-dialog {
+    width: 95vw;
+    height: 95vh;
+    max-width: none;
+    max-height: none;
+  }
+
+  .dialog-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .dialog-header h2 {
+    font-size: 1rem;
+  }
+
+  .close-button {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }
