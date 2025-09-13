@@ -1,153 +1,54 @@
 {% extends "base.html" %} {% block content %}
-<h2>Files List</h2>
+<div class="main-layout">
+  <!-- Include Side Menu Component -->
+  {% include 'files-upload.html' %}
 
-<table>
-  <head>
-    <tr>
-      <th>Name</th>
-      <th>Creation Date</th>
-    </tr>
-  </head>
-  <body>
-    {% for file in files %}
-    <tr onclick="handleFileClick('{{ file.key }}', '{{bucket}}');">
-      <td><a href="/api/v1/{{bucket}}/{{ file.key }}">{{ file.key }}</a></td>
-      <td>{{ file.last_modified }}</td>
-    </tr>
-    {% endfor %}
-  </body>
-</table>
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-header">
+      <h2>Files List</h2>
+      <button id="openSideMenu" class="open-side-menu-button">
+        <span class="menu-icon">📁</span>
+        Upload Files
+      </button>
+    </div>
 
-<!-- File Viewer Modal Dialog -->
-<dialog id="fileViewerDialog" class="file-viewer-dialog">
-  <div class="dialog-header">
-    <h2 id="dialogTitle">File Viewer</h2>
-    <button id="closeDialog" class="close-button" aria-label="Close dialog">
-      &times;
-    </button>
-  </div>
-  <div class="dialog-content">
-    <div id="previewContainer"></div>
-  </div>
-</dialog>
+    <table>
+      <head>
+        <tr>
+          <th>Name</th>
+          <th>Creation Date</th>
+        </tr>
+      </head>
+      <body>
+        {% for file in files %}
+        <tr onclick="handleFileClick('{{ file.key }}', '{{bucket}}');">
+          <td>
+            <a href="/api/v1/{{bucket}}/{{ file.key }}">{{ file.key }}</a>
+          </td>
+          <td>{{ file.last_modified }}</td>
+        </tr>
+        {% endfor %}
+      </body>
+    </table>
+  </main>
+</div>
 
-<form
-  onsubmit="event.preventDefault(); uploadFile(this);"
-  enctype="multipart/form-data"
->
-  <script>
-    // File type detection and preview method mapping
-    const fileTypeConfig = {
-      image: ["png", "jpg", "jpeg", "webp", "gif"],
-      video: ["mp4", "avi", "webm", "mov"],
-      document: ["pdf"],
-      iframe: ["html", "htm", "txt"],
-    };
+<!-- Include File Preview Component -->
+{% include 'files-preview.html' %}
 
-    function getFileType(filename) {
-      const ext = filename.split(".").pop().toLowerCase();
-      for (const [type, extensions] of Object.entries(fileTypeConfig)) {
-        if (extensions.includes(ext)) return type;
-      }
-      return null;
-    }
-
-    function shouldOpenInDialog(filename) {
-      return getFileType(filename) !== null;
-    }
-
-    function handleFileClick(filename, bucket) {
-      if (shouldOpenInDialog(filename)) {
-        openFileInDialog(filename, bucket);
-      } else {
-        window.open(`/api/v1/${bucket}/${filename}`, "_blank");
-      }
-    }
-
-    function createPreviewElement(fileType, url) {
-      const container = document.getElementById("previewContainer");
-      container.innerHTML = "";
-
-      switch (fileType) {
-        case "image":
-          const img = document.createElement("img");
-          img.src = url;
-          img.alt = "Preview";
-          container.appendChild(img);
-          break;
-        case "video":
-          const video = document.createElement("video");
-          video.src = url;
-          video.controls = true;
-          video.autoplay = false;
-          container.appendChild(video);
-          break;
-        case "document":
-        case "iframe":
-        default:
-          const iframe = document.createElement("iframe");
-          iframe.src = url;
-          container.appendChild(iframe);
-          break;
-      }
-    }
-
-    function openFileInDialog(filename, bucket) {
-      const dialog = document.getElementById("fileViewerDialog");
-      const title = document.getElementById("dialogTitle");
-      const fileType = getFileType(filename);
-      const url = `/api/v1/${bucket}/${filename}`;
-
-      title.textContent = `Viewing: ${filename}`;
-      createPreviewElement(fileType, url);
-      dialog.showModal();
-    }
-
-    function closeDialog() {
-      const dialog = document.getElementById("fileViewerDialog");
-      const container = document.getElementById("previewContainer");
-
-      dialog.close();
-      container.innerHTML = "";
-    }
-
-    // Event listeners
-    document.addEventListener("DOMContentLoaded", function () {
-      const dialog = document.getElementById("fileViewerDialog");
-      const closeButton = document.getElementById("closeDialog");
-
-      closeButton.addEventListener("click", closeDialog);
-
-      // Close dialog when clicking outside of it
-      dialog.addEventListener("click", function (event) {
-        if (event.target === dialog) {
-          closeDialog();
-        }
-      });
-
-      // Close dialog with Escape key
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" && dialog.open) {
-          closeDialog();
-        }
-      });
+<script>
+  async function uploadFile(form) {
+    const file = form.file.files[0];
+    const filename = form.name.value || file.name;
+    const response = await fetch(`/api/v1/{{ bucket }}/${filename}`, {
+      method: "PUT",
+      body: file,
     });
-
-    async function uploadFile(form) {
-      const file = form.file.files[0];
-      const filename = form.name.value || file.name;
-      const response = await fetch(`/api/v1/{{ bucket }}/${filename}`, {
-        method: "PUT",
-        body: file,
-      });
-      if (response.ok) {
-        window.location.reload();
-      }
+    if (response.ok) {
+      window.location.reload();
     }
-  </script>
-  <input type="text" name="name" />
-  <input type="file" name="file" />
-  <input type="submit" />
-</form>
+  }
+</script>
 
 {% endblock %}

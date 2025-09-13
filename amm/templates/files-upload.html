@@ -1,0 +1,96 @@
+<!-- Side Menu Component -->
+<aside id="sideMenu" class="side-menu">
+  <div class="side-menu-header">
+    <h3>Upload Files</h3>
+    <button
+      id="closeSideMenu"
+      class="close-side-menu"
+      aria-label="Close side menu"
+    >
+      &times;
+    </button>
+  </div>
+  <div class="side-menu-content">
+    <form
+      id="uploadForm"
+      onsubmit="event.preventDefault(); uploadFile(this);"
+      enctype="multipart/form-data"
+      class="upload-form"
+    >
+      <div class="form-group">
+        <label for="fileName">File Name (optional)</label>
+        <input
+          type="text"
+          id="fileName"
+          name="name"
+          placeholder="Enter custom filename..."
+          class="form-input"
+        />
+      </div>
+      <div class="form-group">
+        <label for="fileInput" class="file-input-label">
+          <span class="file-input-text">Choose File</span>
+          <input
+            type="file"
+            id="fileInput"
+            name="file"
+            class="file-input"
+            required
+          />
+        </label>
+      </div>
+      <button type="submit" class="upload-button">
+        <span class="upload-icon">📤</span>
+        Upload File
+      </button>
+    </form>
+  </div>
+</aside>
+
+<!-- Side Menu Backdrop -->
+<div id="sideMenuBackdrop" class="side-menu-backdrop"></div>
+
+<script>
+  // Side menu functionality
+  function openSideMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+    const backdrop = document.getElementById("sideMenuBackdrop");
+    sideMenu.classList.add("side-menu-open");
+    backdrop.classList.add("side-menu-backdrop-visible");
+  }
+
+  function closeSideMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+    const backdrop = document.getElementById("sideMenuBackdrop");
+    sideMenu.classList.remove("side-menu-open");
+    backdrop.classList.remove("side-menu-backdrop-visible");
+  }
+
+  // Initialize side menu when DOM is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    const openButton = document.getElementById("openSideMenu");
+    const closeButton = document.getElementById("closeSideMenu");
+    const backdrop = document.getElementById("sideMenuBackdrop");
+
+    if (openButton) {
+      openButton.addEventListener("click", openSideMenu);
+    }
+    if (closeButton) {
+      closeButton.addEventListener("click", closeSideMenu);
+    }
+    if (backdrop) {
+      backdrop.addEventListener("click", closeSideMenu);
+    }
+
+    // Close side menu with Escape key
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        closeSideMenu();
+      }
+    });
+  });
+
+  // Make functions globally available
+  window.openSideMenu = openSideMenu;
+  window.closeSideMenu = closeSideMenu;
+</script>
