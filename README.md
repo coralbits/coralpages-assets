@@ -18,6 +18,10 @@ Future goals:
 - [ ] File versioning - Allow to keep multiple versions of the same file, and retrieve them later.
 - [ ] Alternative backends - S3, GCP, Azure, etc. Each bucket can have other backend.
 
+## OpenAPI Documentation
+
+All openapi documentation can be accessed at `/docs/`.
+
 ## Simple web app
 
 There is a simple web app running at `/` to allow easy access to items. It can be disabled at the `config.yaml` file.

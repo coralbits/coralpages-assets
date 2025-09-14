@@ -240,6 +240,14 @@ body {
   gap: var(--space-xl);
 }
 
+.flex-1 {
+  flex: 1;
+}
+
+.mr-12px {
+  margin-right: 12px;
+}
+
 /* ==========================================================================
    LAYOUT COMPONENTS
    ========================================================================== */
@@ -247,6 +255,7 @@ body {
 header {
   display: flex;
   justify-content: start;
+  flex-direction: column;
   gap: var(--space-lg);
   padding-left: var(--space-lg);
   align-items: center;
@@ -254,6 +263,13 @@ header {
   border-bottom: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: 0 1px 2px var(--focus-shadow);
+}
+
+@media (min-width: 768px) {
+  header {
+    flex-direction: row;
+    padding-left: var(--space-xl);
+  }
 }
 
 header a {
