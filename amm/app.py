@@ -39,7 +39,7 @@ async def root(request: fastapi.Request):
 async def files(request: fastapi.Request, bucket: str):
     storage = get_storage(bucket)
     files = storage.list_files(bucket)
-    print(files)
+    # print(files)
     return templates.TemplateResponse(
         "files.html", {"request": request, "files": files, "bucket": bucket}
     )

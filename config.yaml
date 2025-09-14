@@ -4,6 +4,7 @@ server:
   reload: true
   allow_origins:
     - "*"
+  enable_web_ui: true
 
 storage:
   - name: default

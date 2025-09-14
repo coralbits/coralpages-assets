@@ -23,6 +23,7 @@ class ServerConfig:
     port: int = 8005
     reload: bool = False
     allow_origins: list[str] = field(default_factory=lambda: ["*"])
+    enable_web_ui: bool = True
 
     def update_from_dict(self, config: dict):
         if "host" in config:
@@ -33,6 +34,8 @@ class ServerConfig:
             self.reload = config["reload"]
         if "allow_origins" in config:
             self.allow_origins = config["allow_origins"]
+        if "enable_web_ui" in config:
+            self.enable_web_ui = config["enable_web_ui"]
 
 
 @dataclass

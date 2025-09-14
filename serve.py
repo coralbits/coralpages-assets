@@ -40,8 +40,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(amm_routes)
-
 
 @app.middleware("http")
 async def set_trace_id(request: fastapi.Request, call_next):
@@ -183,6 +181,12 @@ try:
 except Exception as e:
     logger.error("Error loading config: %s", e)
     sys.exit(1)
+
+if config.server.enable_web_ui:
+    app.include_router(amm_routes)
+else:
+    logger.info("Web UI is disabled")
+
 
 if __name__ == "__main__":
     uvicorn.run(

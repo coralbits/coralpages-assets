@@ -66,7 +66,7 @@ class DiskStorage(Storage):
             self.path,
         )
 
-        def list_recursive(path: str, prefix: str) -> Generator[FileData, None, None]:
+        def list_recursive(path: Path, prefix: str) -> Generator[FileData, None, None]:
             files = os.listdir(path)
             # first list plain files
             for file in files:
@@ -97,7 +97,7 @@ class DiskStorage(Storage):
                 start + limit,
             )
         )
-        logger.debug("Found files count=%s", ret)
+        # logger.debug("Found files count=%s", ret)
         return ret
 
     @contextmanager
