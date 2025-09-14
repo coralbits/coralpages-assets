@@ -40,6 +40,11 @@
   /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
+
+  /* Z-Index Layers */
+  --z-sticky: 200;
+  --z-overlay: 400;
+  --z-modal: 450;
 }
 
 /* Dark Theme */
@@ -287,7 +292,7 @@ header a:hover {
   position: fixed;
   top: var(--space-lg);
   right: var(--space-lg);
-  z-index: 1001;
+  z-index: var(--z-sticky);
 }
 
 .theme-toggle {
@@ -451,7 +456,7 @@ input[type="submit"]:active {
   box-shadow: 0 2px 8px var(--focus-shadow);
   padding: 0;
   margin: 0;
-  z-index: 1000;
+  z-index: var(--z-modal);
   overflow: hidden;
   animation: dialogFadeIn var(--transition-normal) ease-out;
 }
@@ -600,7 +605,7 @@ input[type="submit"]:active {
   background: var(--bg-surface);
   border-right: 1px solid var(--border);
   box-shadow: 2px 0 8px var(--focus-shadow);
-  z-index: 1000;
+  z-index: var(--z-modal);
   transition: left var(--transition-normal);
   overflow-y: auto;
 }
@@ -792,7 +797,7 @@ input[type="submit"]:active {
   opacity: 0;
   visibility: hidden;
   transition: all var(--transition-normal);
-  z-index: 999;
+  z-index: var(--z-overlay);
 }
 
 .side-menu-backdrop-visible {
@@ -808,6 +813,10 @@ input[type="submit"]:active {
   .side-menu {
     width: 100vw;
     left: -100vw;
+  }
+
+  .side-menu.side-menu-open {
+    left: 0;
   }
 
   .main-content {
