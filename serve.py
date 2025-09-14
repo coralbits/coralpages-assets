@@ -5,6 +5,7 @@ Serve the application.
 """
 
 import argparse
+import io
 import json
 import logging
 import mimetypes
@@ -19,6 +20,7 @@ from am.config import config, load_config
 from am.storage.factory import get_storage
 from am.storage.types import NoSuchBucketError
 from am.setup import setup_logging, trace_id_var
+from am.transforms.factory import factory as transforms_factory
 from amm.app import routes as amm_routes
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -111,13 +113,25 @@ def head_file(bucket: str, file: str):
 
 
 @app.get("/api/v1/{bucket}/{file:path}")
-def get_file(request: fastapi.Request, bucket: str, file: str):
+def get_file(
+    request: fastapi.Request, bucket: str, file: str, transform: str | None = None
+):
+    if transform:
+        transform = transforms_factory.create_transform(transform, request.query_params)
+    else:
+        transform = None
+
     storage = get_storage(bucket)
     mime_type = mimetypes.guess_type(file)[0] or "application/octet-stream"
     try:
         stat = storage.stat(bucket, file)
         with storage.open_read(bucket, file) as f:
-            content = f.read()
+            if transform:
+                content = io.BytesIO()
+                transform.apply(f, content)
+                content = content.getvalue()
+            else:
+                content = f.read()
     except Exception as e:
         traceback.print_exc()
         return fastapi.Response(
